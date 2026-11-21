@@ -203,3 +203,59 @@ def limpiar_arreglos():
     for arreglo in (codigos, solicitantes, dnis, telefonos, barrios, direcciones,
                     solicitudes, danos, atrapados, afectados, riesgos, puntajes, niveles):
         arreglo.clear()
+
+        
+# ----------------------------------------------------------------------
+# BÚSQUEDA Y ORDENAMIENTO
+# ----------------------------------------------------------------------
+def buscar_lineal(codigo):
+    codigo = codigo.strip().upper()
+    for i in range(len(codigos)):
+        if codigos[i] == codigo:
+            return i
+    return -1
+
+def indices_ordenados_por_codigo():
+    orden = list(range(len(codigos)))
+    for i in range(1, len(orden)):
+        actual = orden[i]
+        j = i - 1
+        while j >= 0 and codigos[orden[j]] > codigos[actual]:
+            orden[j + 1] = orden[j]
+            j -= 1
+        orden[j + 1] = actual
+    return orden
+
+def buscar_binaria(codigo):
+    codigo = codigo.strip().upper()
+    orden = indices_ordenados_por_codigo()
+    izq, der = 0, len(orden) - 1
+    while izq <= der:
+        medio = (izq + der) // 2
+        c = codigos[orden[medio]]
+        if c == codigo:
+            return orden[medio]
+        elif c < codigo:
+            izq = medio + 1
+        else:
+            der = medio - 1
+    return -1
+
+def rango_nivel(nivel):
+    return ["CRÍTICO", "ALTO", "MEDIO", "BAJO"].index(nivel)
+
+def indices_priorizados():
+    orden = list(range(len(codigos)))
+    n = len(orden)
+    for i in range(n - 1):
+        mejor = i
+        for j in range(i + 1, n):
+            a, b = orden[j], orden[mejor]
+            nivel_a, nivel_b = rango_nivel(niveles[a]), rango_nivel(niveles[b])
+            if nivel_a < nivel_b:
+                mejor = j
+            elif nivel_a == nivel_b:
+                if puntajes[a] > puntajes[b] or (puntajes[a] == puntajes[b] and codigos[a] < codigos[b]):
+                    mejor = j
+        orden[i], orden[mejor] = orden[mejor], orden[i]
+    return orden
