@@ -109,3 +109,51 @@ def validar_si_no(texto):
 
 def normalizar(texto):
     return " ".join(p.capitalize() for p in texto.strip().split())
+
+
+# ----------------------------------------------------------------------
+# LÓGICA DE NEGOCIO: CLASIFICACIÓN AUTOMÁTICA
+# ----------------------------------------------------------------------
+def calcular_puntaje(tipo_dano, n_atrapados, n_afectados, riesgo):
+    base = PUNTOS_DANO[TIPOS_DANO.index(tipo_dano)]
+    extra_riesgo = 40 if riesgo == "SI" else 0
+    return base + n_atrapados * 25 + n_afectados * 2 + extra_riesgo
+
+def clasificar_nivel(puntaje, n_atrapados):
+    if n_atrapados >= 1:
+        return "CRÍTICO"
+    if puntaje >= 150:
+        return "CRÍTICO"
+    elif puntaje >= 80:
+        return "ALTO"
+    elif puntaje >= 30:
+        return "MEDIO"
+    return "BAJO"
+
+def generar_codigo():
+    mayor = 0
+    for c in codigos:
+        numero = int(c.split("-")[2])
+        if numero > mayor:
+            mayor = numero
+    return "SIS-" + str(ANIO) + "-" + str(mayor + 1).zfill(4)
+
+def agregar_expediente(nombre, dni, tel, barrio, direccion, solicitud,
+                       tipo_dano, n_atr, n_afe, riesgo):
+    codigo = generar_codigo()
+    riesgo = "SI" if riesgo.strip().upper() in ("SI", "SÍ", "S") else "NO"
+    puntaje = calcular_puntaje(tipo_dano, n_atr, n_afe, riesgo)
+    codigos.append(codigo)
+    solicitantes.append(normalizar(nombre))
+    dnis.append(dni)
+    telefonos.append(tel)
+    barrios.append(buscar_barrio(barrio))
+    direcciones.append(direccion.strip())
+    solicitudes.append(solicitud)
+    danos.append(tipo_dano)
+    atrapados.append(n_atr)
+    afectados.append(n_afe)
+    riesgos.append(riesgo)
+    puntajes.append(puntaje)
+    niveles.append(clasificar_nivel(puntaje, n_atr))
+    return codigo
