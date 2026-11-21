@@ -259,3 +259,86 @@ def indices_priorizados():
                     mejor = j
         orden[i], orden[mejor] = orden[mejor], orden[i]
     return orden
+
+
+# ----------------------------------------------------------------------
+# SALIDA POR PANTALLA
+# ----------------------------------------------------------------------
+def mostrar_detalle(i):
+    print("  Código          :", codigos[i])
+    print("  Solicitante     :", solicitantes[i], "(DNI " + dnis[i] + ", cel. " + telefonos[i] + ")")
+    print("  Ubicación       :", direcciones[i] + " - " + barrios[i] + ", Santa Anita")
+    print("  Tipo solicitud  :", solicitudes[i])
+    print("  Tipo de daño    :", danos[i])
+    print("  Heridos/atrapad.:", atrapados[i])
+    print("  Personas afect. :", afectados[i])
+    print("  Riesgo inminente:", riesgos[i])
+    print("  Puntaje         :", puntajes[i], "-> Nivel", niveles[i])
+
+def mostrar_tabla(orden, titulo):
+    print()
+    print("=" * 116)
+    print(titulo)
+    print("=" * 116)
+    if len(orden) == 0:
+        print("No hay expedientes registrados.")
+        return
+    formato = "{:<3} {:<14} {:<26} {:<24} {:<16} {:>4} {:>5} {:>6}  {:<8}"
+    print(formato.format("N°", "CÓDIGO", "SOLICITANTE", "BARRIO/URB.", "TIPO DE DAÑO",
+                         "ATR", "AFEC", "PUNTOS", "NIVEL"))
+    print("-" * 116)
+    pos = 1
+    for i in orden:
+        print(formato.format(pos, codigos[i], solicitantes[i][:26], barrios[i][:24],
+                             DANO_CORTO[TIPOS_DANO.index(danos[i])], atrapados[i], afectados[i], puntajes[i], niveles[i]))
+        pos += 1
+    print("-" * 116)
+
+def mostrar_todos_detalle():
+    print()
+    print("=" * 116)
+    print("FICHAS COMPLETAS DE TODOS LOS EXPEDIENTES (SANTA ANITA)")
+    print("=" * 116)
+    if len(codigos) == 0:
+        print("No hay expedientes registrados.")
+        return
+    for i in indices_ordenados_por_codigo():
+        print("-" * 62)
+        mostrar_detalle(i)
+    print("-" * 62)
+    print("Total impreso:", len(codigos), "expedientes")
+
+def resumen_estadistico():
+    print()
+    print("RESUMEN ESTADÍSTICO - SANTA ANITA")
+    print("-" * 44)
+    print("Total de expedientes      :", len(codigos))
+    print("Heridos / atrapados       :", sum(atrapados))
+    print("Personas afectadas        :", sum(afectados))
+    for nivel in ("CRÍTICO", "ALTO", "MEDIO", "BAJO"):
+        cantidad = 0
+        for n in niveles:
+            if n == nivel:
+                cantidad += 1
+        print("Expedientes nivel {:<8}: {}".format(nivel, cantidad))
+
+def exportar_reporte():
+    nombre = "reporte_sismo_santa_anita.txt"
+    with open(nombre, "w", encoding="utf-8") as f:
+        f.write("MESA DE PARTES DIGITAL - SISMO (SANTA ANITA)\n")
+        f.write("REPORTE DE EXPEDIENTES - LISTA PRIORIZADA\n")
+        f.write("=" * 72 + "\n")
+        pos = 1
+        for i in indices_priorizados():
+            f.write("\n{}. {}  |  {} pts  |  NIVEL {}\n".format(pos, codigos[i], puntajes[i], niveles[i]))
+            f.write("   Solicitante : {} (DNI {}, cel. {})\n".format(solicitantes[i], dnis[i], telefonos[i]))
+            f.write("   Ubicación   : {} - {}, Santa Anita\n".format(direcciones[i], barrios[i]))
+            f.write("   Solicitud   : {}\n".format(solicitudes[i]))
+            f.write("   Daño        : {}\n".format(danos[i]))
+            f.write("   Heridos/atrapados: {} | Personas afectadas: {} | Riesgo inminente: {}\n".format(
+                atrapados[i], afectados[i], riesgos[i]))
+            pos += 1
+        f.write("\n" + "=" * 72 + "\n")
+        f.write("Total de expedientes: {}\n".format(len(codigos)))
+    print("[OK] Reporte generado:", nombre)
+    
