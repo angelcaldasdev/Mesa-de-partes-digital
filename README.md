@@ -57,6 +57,7 @@ python mesadepartes.py
 | 0 | Salir |
 
 ## Autor
-Angel Caldas Ocmin - [@angelcaldasdev](https://github.com/angelcaldasdev)
-Elber Nuñez Iguavel
-Milovan Rojas Romero
+## Integrantes
+- Angel Caldas Ocmin - [@angelcaldasdev](https://github.com/angelcaldasdev)
+- Elber Nuñez Iguavel
+- Milovan Rojas Romero
