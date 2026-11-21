@@ -422,4 +422,48 @@ def cargar_ejemplos():
         agregar_expediente(d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9])
     guardar_archivo()
     print("Datos de ejemplo de Santa Anita cargados. Total:", len(codigos))
-    
+
+
+# ----------------------------------------------------------------------
+# MENÚ PRINCIPAL
+# ----------------------------------------------------------------------
+def menu():
+    cargar_archivo()
+    if len(codigos) == 0:
+        cargar_ejemplos()
+    mostrar_tabla(indices_ordenados_por_codigo(), "EXPEDIENTES EN SANTA ANITA (ordenados por código)")
+    while True:
+        print("\n" + "=" * 58)
+        print("  MESA DE PARTES DIGITAL - SISMO (SANTA ANITA)")
+        print("=" * 58)
+        print("  1. Registrar expediente")
+        print("  2. Consultar expediente por código")
+        print("  3. Listar expedientes ordenados por código")
+        print("  4. Lista PRIORIZADA (CRÍTICO, ALTO, MEDIO, BAJO)")
+        print("  5. Resumen estadístico")
+        print("  6. Cargar expedientes de ejemplo de Santa Anita")
+        print("  7. Exportar reporte para imprimir")
+        print("  0. Salir")
+        opcion = input("Seleccione una opción: ").strip()
+        if opcion == "1":
+            registrar_interactivo()
+        elif opcion == "2":
+            consultar_interactivo()
+        elif opcion == "3":
+            mostrar_tabla(indices_ordenados_por_codigo(), "EXPEDIENTES ORDENADOS POR CÓDIGO")
+        elif opcion == "4":
+            mostrar_tabla(indices_priorizados(), "LISTA PRIORIZADA")
+        elif opcion == "5":
+            resumen_estadistico()
+        elif opcion == "6":
+            cargar_ejemplos()
+        elif opcion == "7":
+            exportar_reporte()
+        elif opcion == "0":
+            print("Hasta pronto.")
+            break
+        else:
+            print("[!] Opción no válida.")
+
+if __name__ == "__main__":
+    menu()
