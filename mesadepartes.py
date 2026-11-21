@@ -157,3 +157,49 @@ def agregar_expediente(nombre, dni, tel, barrio, direccion, solicitud,
     puntajes.append(puntaje)
     niveles.append(clasificar_nivel(puntaje, n_atr))
     return codigo
+
+
+# ----------------------------------------------------------------------
+# PERSISTENCIA EN ARCHIVOS
+# ----------------------------------------------------------------------
+def guardar_archivo():
+    with open(ARCHIVO, "w", encoding="utf-8") as f:
+        for i in range(len(codigos)):
+            linea = SEPARADOR.join([
+                codigos[i], solicitantes[i], dnis[i], telefonos[i],
+                barrios[i], direcciones[i], solicitudes[i], danos[i],
+                str(atrapados[i]), str(afectados[i]), riesgos[i]
+            ])
+            f.write(linea + "\n")
+
+def cargar_archivo():
+    limpiar_arreglos()
+    if not os.path.exists(ARCHIVO):
+        return 0
+    with open(ARCHIVO, "r", encoding="utf-8") as f:
+        for linea in f:
+            p = linea.strip().split(SEPARADOR)
+            if len(p) != 11:
+                continue
+            if p[7] not in TIPOS_DANO:
+                continue
+            puntaje = calcular_puntaje(p[7], int(p[8]), int(p[9]), p[10])
+            codigos.append(p[0])
+            solicitantes.append(p[1])
+            dnis.append(p[2])
+            telefonos.append(p[3])
+            barrios.append(p[4])
+            direcciones.append(p[5])
+            solicitudes.append(p[6])
+            danos.append(p[7])
+            atrapados.append(int(p[8]))
+            afectados.append(int(p[9]))
+            riesgos.append(p[10])
+            puntajes.append(puntaje)
+            niveles.append(clasificar_nivel(puntaje, int(p[8])))
+    return len(codigos)
+
+def limpiar_arreglos():
+    for arreglo in (codigos, solicitantes, dnis, telefonos, barrios, direcciones,
+                    solicitudes, danos, atrapados, afectados, riesgos, puntajes, niveles):
+        arreglo.clear()
