@@ -341,4 +341,85 @@ def exportar_reporte():
         f.write("\n" + "=" * 72 + "\n")
         f.write("Total de expedientes: {}\n".format(len(codigos)))
     print("[OK] Reporte generado:", nombre)
+
+    
+# ----------------------------------------------------------------------
+# ENTRADA DE DATOS CON VALIDACIÓN
+# ----------------------------------------------------------------------
+def pedir(mensaje, validador, error):
+    while True:
+        valor = input(mensaje).strip()
+        if validador(valor):
+            return valor
+        print("  [!] " + error)
+
+def pedir_opcion_lista(titulo, opciones):
+    print(titulo)
+    for k in range(len(opciones)):
+        print("   {}. {}".format(k + 1, opciones[k]))
+    while True:
+        eleccion = input("  Elija una opción: ").strip()
+        if validar_entero(eleccion, 1, len(opciones)):
+            return opciones[int(eleccion) - 1]
+        print("  [!] Opción fuera de rango.")
+
+def registrar_interactivo():
+    print("\n--- REGISTRO DE NUEVO EXPEDIENTE (SANTA ANITA) ---")
+    nombre = pedir("Nombres y apellidos del solicitante: ", validar_nombre,
+                   "Solo letras y espacios (mínimo 5 caracteres).")
+    dni = pedir("DNI (8 dígitos): ", validar_dni, "El DNI debe tener 8 dígitos numéricos.")
+    tel = pedir("Celular (9 dígitos, inicia con 9): ", validar_telefono, "Celular inválido.")
+    barrio = pedir("Barrio o Urbanización de Santa Anita: ",
+                    lambda t: buscar_barrio(t) != "",
+                    "Barrio no válido. Escriba una zona válida (ej. Los Ficus, Nocheto, Universal).")
+    direccion = pedir("Dirección o referencia específica: ", validar_texto,
+                      "Ingrese una dirección de al menos 5 caracteres (sin el símbolo |).")
+    solicitud = pedir_opcion_lista("Tipo de solicitud:", TIPOS_SOLICITUD)
+    tipo_dano = pedir_opcion_lista("Tipo de daño:", TIPOS_DANO)
+    n_atr = int(pedir("Personas heridas o atrapadas (0-500): ", lambda t: validar_entero(t, 0, 500),
+                      "Ingrese un entero entre 0 y 500."))
+    n_afe = int(pedir("Personas afectadas (0-5000): ", lambda t: validar_entero(t, 0, 5000),
+                      "Ingrese un entero entre 0 y 5000."))
+    riesgo = pedir("¿Hay riesgo inminente (gas, réplicas, colapso)? (SI/NO): ", validar_si_no,
+                   "Responda SI o NO.")
+    codigo = agregar_expediente(nombre, dni, tel, barrio, direccion, solicitud,
+                                tipo_dano, n_atr, n_afe, riesgo)
+    guardar_archivo()
+    i = buscar_lineal(codigo)
+    print("\n[OK] Expediente registrado y guardado. Código asignado:", codigo)
+    print("     Clasificación automática:", niveles[i], "(" + str(puntajes[i]) + " puntos)")
+
+def indices_codigos_texto():
+    return [codigos[i] for i in indices_ordenados_por_codigo()]
+
+def consultar_interactivo():
+    codigo = input("Ingrese el código del expediente: ")
+    i = buscar_binaria(codigo)
+    if i == -1:
+        print("[X] No se encontró el expediente", codigo.upper())
+    else:
+        print("\n[OK] Expediente encontrado:")
+        mostrar_detalle(i)
+
+
+# ----------------------------------------------------------------------
+# DATOS DE PRUEBA DE SANTA ANITA
+# ----------------------------------------------------------------------
+DATOS_DEMO = [
+    ("juan carlos quispe rojas", "45871236", "987654321", "Nocheto", "Jr. Los Robles 120",
+     "Solicitud de ayuda", "Colapso de edificio o vivienda", 3, 40, "SI"),
+    ("maría elena torres vega", "40123987", "912345678", "Los Ficus", "Av. Huancaray 450",
+     "Pedido de atención", "Incendio o fuga de gas", 0, 25, "SI"),
+    ("luis alberto mendoza paz", "70456123", "999111222", "Universal", "Calle 4 Mz. C",
+     "Reporte de daños", "Vivienda con daños severos", 0, 12, "NO"),
+    ("rosa angélica flores díaz", "32165498", "945612378", "El Asesor", "Calle Los Tulipanes",
+     "Reporte de daños", "Vía bloqueada o puente dañado", 0, 30, "NO")
+]
+
+def cargar_ejemplos():
+    limpiar_arreglos()
+    for d in DATOS_DEMO:
+        agregar_expediente(d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9])
+    guardar_archivo()
+    print("Datos de ejemplo de Santa Anita cargados. Total:", len(codigos))
     
