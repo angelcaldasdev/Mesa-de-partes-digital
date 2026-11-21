@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+# Datos generados (contienen DNIs y datos personales)
+expedientes_sismo_santa_anita.txt
+reporte_sismo_santa_anita.txt
